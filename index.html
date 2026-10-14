@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBER SNAKE // Retro Arcade Experience</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="crt-enabled">
+  <div class="crt-overlay" id="crtOverlay"></div>
+  <div class="stars-bg"></div>
+
+  <main class="arcade-cabinet">
+    <!-- Header / Marquee -->
+    <header class="arcade-header">
+      <div class="cabinet-badges">
+        <span class="badge live-badge"><span class="pulse-dot"></span> 1P READY</span>
+        <span class="badge sys-badge">ANTIGRAVITY VSC v1.0</span>
+      </div>
+      <h1 class="arcade-title">
+        <span class="neon-pink">CYBER</span>
+        <span class="neon-cyan">SNAKE</span>
+      </h1>
+      <p class="arcade-subtitle">ARCADE EDITION &bull; SYNTH RETRO EXPERIENCE</p>
+    </header>
+
+    <!-- Score & Stats Bar -->
+    <section class="stats-panel">
+      <div class="stat-card">
+        <span class="stat-label">SCORE</span>
+        <span class="stat-value neon-cyan" id="scoreDisplay">0000</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">HIGH SCORE</span>
+        <span class="stat-value neon-yellow" id="highScoreDisplay">0000</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">MULTIPLIER</span>
+        <span class="stat-value neon-pink" id="multiplierDisplay">x1.0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">SPEED LEVEL</span>
+        <span class="stat-value neon-green" id="levelDisplay">LVL 1</span>
+      </div>
+    </section>
+
+    <!-- Game Screen / Canvas Frame -->
+    <section class="screen-container">
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="480" height="480"></canvas>
+
+        <!-- Start / Pause / Game Over Overlay -->
+        <div class="screen-overlay" id="screenOverlay">
+          <div class="overlay-content" id="startScreen">
+            <h2 class="neon-glow-text">INSERT COIN</h2>
+            <p class="blink-text">PRESIONA ESPACIO O EL BOTÓN DE INICIO</p>
+            <div class="instructions-pill">
+              <span>Usa <strong>WASD</strong> o <strong>FLECHAS</strong> para moverte</span>
+            </div>
+            <button class="arcade-btn primary" id="btnPlay">COMENZAR PARTIDA</button>
+          </div>
+
+          <div class="overlay-content hidden" id="gameOverScreen">
+            <h2 class="neon-pink glitch-text">GAME OVER</h2>
+            <p class="final-score-text">PUNTUACIÓN FINAL: <span id="finalScore" class="neon-cyan">0</span></p>
+            <p id="newRecordNotice" class="record-tag hidden">★ ¡NUEVO RÉCORD! ★</p>
+            <button class="arcade-btn primary" id="btnRestart">REINTENTAR</button>
+          </div>
+
+          <div class="overlay-content hidden" id="pauseScreen">
+            <h2 class="neon-cyan">PAUSA</h2>
+            <p>Juego en pausa</p>
+            <button class="arcade-btn primary" id="btnResume">CONTINUAR</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Arcade Control Deck -->
+    <section class="control-deck">
+      <div class="options-bar">
+        <div class="setting-group">
+          <label for="difficultySelect">DIFICULTAD:</label>
+          <select id="difficultySelect" class="arcade-select">
+            <option value="easy">Cadete (Fácil)</option>
+            <option value="normal" selected>Piloto (Normal)</option>
+            <option value="hard">Ciberpunk (Difícil)</option>
+            <option value="hyper">Hyperdrive (Extremo)</option>
+          </select>
+        </div>
+
+        <div class="toggle-buttons">
+          <button id="btnSoundToggle" class="icon-toggle active" title="Alternar Sonido Sintético">
+            <span class="icon">🔊</span> <span class="label">AUDIO: ON</span>
+          </button>
+          <button id="btnCrtToggle" class="icon-toggle active" title="Efecto CRT / Scanlines">
+            <span class="icon">📺</span> <span class="label">CRT: ON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Virtual D-Pad for Mobile or Mouse interaction -->
+      <div class="virtual-controls">
+        <div class="dpad">
+          <button class="dpad-btn up" id="dpadUp" aria-label="Arriba">▲</button>
+          <div class="dpad-middle">
+            <button class="dpad-btn left" id="dpadLeft" aria-label="Izquierda">◀</button>
+            <div class="dpad-center"></div>
+            <button class="dpad-btn right" id="dpadRight" aria-label="Derecha">▶</button>
+          </div>
+          <button class="dpad-btn down" id="dpadDown" aria-label="Abajo">▼</button>
+        </div>
+
+        <div class="action-buttons">
+          <button class="arcade-btn btn-action" id="btnPauseGame">PAUSA</button>
+          <button class="arcade-btn btn-action secondary" id="btnResetGame">REINICIAR</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="arcade-footer">
+      <p>Creado en conjunto con <strong>Antigravity AI</strong> en Visual Studio Code.</p>
+      <div class="legend">
+        <span>⚡ Creado con HTML5 Canvas & Web Audio API puro</span>
+      </div>
+    </footer>
+  </main>
+
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
+
