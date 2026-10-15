@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBER SNAKE // Retro Arcade Experience</title>
+  <title>CYBER SNAKE // Retro Arcade Ultimate Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="crt-enabled">
+<body class="crt-enabled theme-cyberpunk">
   <div class="crt-overlay" id="crtOverlay"></div>
+  <canvas id="matrixCanvas" class="matrix-canvas"></canvas>
   <div class="stars-bg"></div>
 
   <main class="arcade-cabinet">
@@ -18,62 +19,186 @@
     <header class="arcade-header">
       <div class="cabinet-badges">
         <span class="badge live-badge"><span class="pulse-dot"></span> 1P READY</span>
-        <span class="badge sys-badge">ANTIGRAVITY VSC v1.0</span>
+        <span class="badge sys-badge">ANTIGRAVITY v2.0 ULTIMATE</span>
       </div>
       <h1 class="arcade-title">
-        <span class="neon-pink">CYBER</span>
-        <span class="neon-cyan">SNAKE</span>
+        <span class="neon-primary">CYBER</span>
+        <span class="neon-secondary">SNAKE</span>
       </h1>
-      <p class="arcade-subtitle">ARCADE EDITION &bull; SYNTH RETRO EXPERIENCE</p>
+      <p class="arcade-subtitle">ARCADE ULTIMATE &bull; MODES, POWER-UPS & SYNTH BGM</p>
     </header>
 
-    <!-- Score & Stats Bar -->
+    <!-- Top Settings & Controls Bar -->
+    <section class="config-bar">
+      <div class="select-group">
+        <label for="modeSelect">MODO:</label>
+        <select id="modeSelect" class="arcade-select">
+          <option value="classic" selected>🌟 Clásico</option>
+          <option value="timeattack">⏳ Contrarreloj</option>
+          <option value="maze">🧱 Laberinto</option>
+          <option value="portal">🌀 Portales</option>
+        </select>
+      </div>
+
+      <div class="select-group">
+        <label for="themeSelect">TEMA:</label>
+        <select id="themeSelect" class="arcade-select">
+          <option value="cyberpunk" selected>🌆 Cyberpunk</option>
+          <option value="matrix">📟 Matrix</option>
+          <option value="vaporwave">🌅 Vaporwave</option>
+          <option value="rainbow">🌈 Arcoíris</option>
+        </select>
+      </div>
+
+      <div class="select-group">
+        <label for="difficultySelect">DIFICULTAD:</label>
+        <select id="difficultySelect" class="arcade-select">
+          <option value="easy">Cadete</option>
+          <option value="normal" selected>Piloto</option>
+          <option value="hard">Ciberpunk</option>
+          <option value="hyper">Hyperdrive</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Toggles Bar -->
+    <section class="toggles-strip">
+      <div class="toggle-buttons">
+        <button id="btnSoundToggle" class="icon-toggle active" title="Sonido SFX">
+          <span class="icon">🔊</span> <span class="label">SFX: ON</span>
+        </button>
+        <button id="btnMusicToggle" class="icon-toggle active" title="Música BGM Chiptune">
+          <span class="icon">🎵</span> <span class="label">BGM: ON</span>
+        </button>
+        <button id="btnCrtToggle" class="icon-toggle active" title="Filtro CRT Scanlines">
+          <span class="icon">📺</span> <span class="label">CRT: ON</span>
+        </button>
+        <button id="btnOpenLeaderboard" class="icon-toggle" title="Ver Salón de la Fama">
+          <span class="icon">🏆</span> <span class="label">TOP 5</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Score & Dynamic Stats Bar -->
     <section class="stats-panel">
       <div class="stat-card">
         <span class="stat-label">SCORE</span>
-        <span class="stat-value neon-cyan" id="scoreDisplay">0000</span>
+        <span class="stat-value neon-secondary" id="scoreDisplay">0000</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">HIGH SCORE</span>
-        <span class="stat-value neon-yellow" id="highScoreDisplay">0000</span>
+        <span class="stat-label">TOP SCORE</span>
+        <span class="stat-value neon-accent" id="highScoreDisplay">0000</span>
       </div>
       <div class="stat-card">
-        <span class="stat-label">MULTIPLIER</span>
-        <span class="stat-value neon-pink" id="multiplierDisplay">x1.0</span>
+        <span class="stat-label">COMBO</span>
+        <span class="stat-value neon-primary" id="multiplierDisplay">x1.0</span>
       </div>
-      <div class="stat-card">
-        <span class="stat-label">SPEED LEVEL</span>
-        <span class="stat-value neon-green" id="levelDisplay">LVL 1</span>
+      <div class="stat-card" id="dynamicStatCard">
+        <span class="stat-label" id="dynamicStatLabel">LEVEL</span>
+        <span class="stat-value neon-green" id="dynamicStatValue">LVL 1</span>
       </div>
     </section>
+
+    <!-- Active Power-up Indicator Banner -->
+    <div id="activePowerupBanner" class="powerup-banner hidden">
+      <div class="powerup-info">
+        <span id="powerupIcon" class="powerup-icon">⚡</span>
+        <span id="powerupName" class="powerup-name">IMÁN ACTIVADO</span>
+      </div>
+      <div class="powerup-progress-track">
+        <div id="powerupProgressBar" class="powerup-progress-bar"></div>
+      </div>
+      <span id="powerupTimeText" class="powerup-time">5.0s</span>
+    </div>
 
     <!-- Game Screen / Canvas Frame -->
     <section class="screen-container">
       <div class="canvas-wrapper">
         <canvas id="gameCanvas" width="480" height="480"></canvas>
 
-        <!-- Start / Pause / Game Over Overlay -->
+        <!-- Overlays -->
         <div class="screen-overlay" id="screenOverlay">
+          <!-- Start Screen -->
           <div class="overlay-content" id="startScreen">
             <h2 class="neon-glow-text">INSERT COIN</h2>
             <p class="blink-text">PRESIONA ESPACIO O EL BOTÓN DE INICIO</p>
+            <div class="mode-desc-pill" id="modeDescriptionPill">
+              Modo Clásico: Recoge comida, usa power-ups y evita las paredes.
+            </div>
+            <div class="powerups-legend">
+              <span>🧲 Imán</span> &bull;
+              <span>⏱️ Slow-Mo</span> &bull;
+              <span>👻 Fantasma</span> &bull;
+              <span>✂️ Tijera</span> &bull;
+              <span>⭐ Gema</span>
+            </div>
             <div class="instructions-pill">
               <span>Usa <strong>WASD</strong> o <strong>FLECHAS</strong> para moverte</span>
             </div>
             <button class="arcade-btn primary" id="btnPlay">COMENZAR PARTIDA</button>
           </div>
 
-          <div class="overlay-content hidden" id="gameOverScreen">
-            <h2 class="neon-pink glitch-text">GAME OVER</h2>
-            <p class="final-score-text">PUNTUACIÓN FINAL: <span id="finalScore" class="neon-cyan">0</span></p>
-            <p id="newRecordNotice" class="record-tag hidden">★ ¡NUEVO RÉCORD! ★</p>
-            <button class="arcade-btn primary" id="btnRestart">REINTENTAR</button>
-          </div>
-
+          <!-- Pause Screen -->
           <div class="overlay-content hidden" id="pauseScreen">
-            <h2 class="neon-cyan">PAUSA</h2>
+            <h2 class="neon-secondary">PAUSA</h2>
             <p>Juego en pausa</p>
             <button class="arcade-btn primary" id="btnResume">CONTINUAR</button>
+          </div>
+
+          <!-- Game Over Screen -->
+          <div class="overlay-content hidden" id="gameOverScreen">
+            <h2 class="neon-primary glitch-text">GAME OVER</h2>
+            <p class="final-score-text">PUNTUACIÓN FINAL: <span id="finalScore" class="neon-secondary">0</span></p>
+            
+            <!-- High Score Initial Entry for Hall of Fame -->
+            <div id="initialsEntryContainer" class="initials-entry-card hidden">
+              <p class="hall-fame-title">★ ¡ENTRASTE AL TOP 5 ARCADE! ★</p>
+              <p class="initials-prompt">ELIGE TUS INICIALES:</p>
+              <div class="initials-selector">
+                <div class="initial-box">
+                  <button class="arrow-btn" id="init1Up">▲</button>
+                  <span class="letter" id="letter1">A</span>
+                  <button class="arrow-btn" id="init1Down">▼</button>
+                </div>
+                <div class="initial-box">
+                  <button class="arrow-btn" id="init2Up">▲</button>
+                  <span class="letter" id="letter2">A</span>
+                  <button class="arrow-btn" id="init2Down">▼</button>
+                </div>
+                <div class="initial-box">
+                  <button class="arrow-btn" id="init3Up">▲</button>
+                  <span class="letter" id="letter3">A</span>
+                  <button class="arrow-btn" id="init3Down">▼</button>
+                </div>
+              </div>
+              <button class="arcade-btn secondary btn-save-score" id="btnSaveInitials">GUARDAR RÉCORD</button>
+            </div>
+
+            <div class="game-over-buttons">
+              <button class="arcade-btn primary" id="btnRestart">REINTENTAR</button>
+              <button class="arcade-btn btn-action" id="btnShowLeaderboardFromOver">VER TOP 5</button>
+            </div>
+          </div>
+
+          <!-- Leaderboard Modal Screen -->
+          <div class="overlay-content hidden" id="leaderboardScreen">
+            <h2 class="neon-accent">🏆 SALÓN DE LA FAMA</h2>
+            <div class="leaderboard-table-container">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>JUGADOR</th>
+                    <th>SCORE</th>
+                    <th>MODO</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+            <button class="arcade-btn primary" id="btnCloseLeaderboard">VOLVER</button>
           </div>
         </div>
       </div>
@@ -81,27 +206,6 @@
 
     <!-- Arcade Control Deck -->
     <section class="control-deck">
-      <div class="options-bar">
-        <div class="setting-group">
-          <label for="difficultySelect">DIFICULTAD:</label>
-          <select id="difficultySelect" class="arcade-select">
-            <option value="easy">Cadete (Fácil)</option>
-            <option value="normal" selected>Piloto (Normal)</option>
-            <option value="hard">Ciberpunk (Difícil)</option>
-            <option value="hyper">Hyperdrive (Extremo)</option>
-          </select>
-        </div>
-
-        <div class="toggle-buttons">
-          <button id="btnSoundToggle" class="icon-toggle active" title="Alternar Sonido Sintético">
-            <span class="icon">🔊</span> <span class="label">AUDIO: ON</span>
-          </button>
-          <button id="btnCrtToggle" class="icon-toggle active" title="Efecto CRT / Scanlines">
-            <span class="icon">📺</span> <span class="label">CRT: ON</span>
-          </button>
-        </div>
-      </div>
-
       <!-- Virtual D-Pad for Mobile or Mouse interaction -->
       <div class="virtual-controls">
         <div class="dpad">
@@ -123,9 +227,9 @@
 
     <!-- Footer -->
     <footer class="arcade-footer">
-      <p>Creado en conjunto con <strong>Antigravity AI</strong> en Visual Studio Code.</p>
+      <p>Cyber Snake Ultimate &bull; Creado con <strong>Antigravity AI</strong> en VS Code.</p>
       <div class="legend">
-        <span>⚡ Creado con HTML5 Canvas & Web Audio API puro</span>
+        <span>⚡ HTML5 Canvas &bull; Web Audio Synthesizer &bull; Haptics &bull; Local Leaderboard</span>
       </div>
     </footer>
   </main>
@@ -134,4 +238,3 @@
   <script src="game.js"></script>
 </body>
 </html>
-
